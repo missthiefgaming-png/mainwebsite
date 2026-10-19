@@ -365,7 +365,7 @@
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">ACTIVE GRADE LEVEL</label>
-                        <select id="db-grade" onchange="syncCredentials()" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-white font-bold text-slate-800">
+                        <select id="db-grade" onchange="onDashboardGradeChange()" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-white font-bold text-slate-800">
                             <option value="1">Grade 1</option>
                             <option value="2">Grade 2</option>
                             <option value="3">Grade 3</option>
@@ -591,11 +591,13 @@
                     <div class="flex flex-wrap gap-2 items-center no-print">
                         <button onclick="autoPlaceItems()" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg font-bold text-xs">⚡ Auto Item Placement</button>
                         <button onclick="addTOSCompetency()" class="bg-slate-900 hover:bg-slate-800 text-white px-3 py-1.5 rounded-lg font-bold text-xs">+ Add Competency</button>
+                        <button type="button" onclick="retrieveSavedTOSData()" class="bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1.5 rounded-lg font-bold text-xs">Retrieve Saved TOS</button>
                         <button onclick="saveTOSData()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg font-bold text-xs">💾 Save TOS Data</button>
                         <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg font-bold text-xs">🖨️ Print TOS</button>
                     </div>
                 </div>
 
+                <p id="tos-save-status" class="text-xs text-slate-500" role="status" aria-live="polite">TOS data is saved separately for each grade, section, subject, and term in this browser.</p>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 border-t">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">SUBJECT TEACHER</label>
@@ -603,7 +605,7 @@
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">SECTION</label>
-                        <select id="tos-section-select" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-white"></select>
+                        <select id="tos-section-select" onchange="retrieveSavedTOSData({silent:true})" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-white"></select>
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">TARGET TOTAL ITEMS</label>
@@ -1688,15 +1690,15 @@
                 }
             });
 
-            loadSavedTOSData();
             loadSavedOMRScannedData();
             renderOMRReviewQueue();
             renderAssessmentHistory();
             updateSubjectDropdown();
             renderSections();
-            renderTOSTable();
             syncCredentials();
-            if (!loadSavedCustomTestQuestions()) generateTestFromTOS();
+            loadSavedTOSData();
+            renderTOSTable();
+            if (!loadSavedCustomTestQuestions() && tosData.length > 0) generateTestFromTOS();
             renderZipSheet();
             renderMPL();
 
@@ -2321,6 +2323,11 @@
             if (typeof renderOMRSheetStudioPreview === 'function') renderOMRSheetStudioPreview();
         }
 
+        function onDashboardGradeChange() {
+            syncCredentials();
+            retrieveSavedTOSData({ silent: true });
+        }
+
         function saveDashboardCredentials() {
             alert('Dashboard credentials & grade-level sections synchronized across all assessment components!');
         }
@@ -2431,6 +2438,7 @@
             syncOMRDropdowns();
             syncMLDropdowns();
             syncMPLDropdowns();
+            retrieveSavedTOSData({ silent: true });
         }
 
         function onGradeOrQuarterChange() {
@@ -2441,6 +2449,7 @@
             syncOMRDropdowns();
             syncMLDropdowns();
             syncMPLDropdowns();
+            retrieveSavedTOSData({ silent: true });
         }
 
         function setTestPaperGrade(grade) {
@@ -2540,37 +2549,115 @@
             if (typeof renderOMRSheetStudioPreview === 'function') renderOMRSheetStudioPreview();
         }
 
+        function getCurrentTOSContext() {
+            return {
+                grade: document.getElementById('tos-grade')?.value || '1',
+                subject: document.getElementById('tos-subject')?.value || 'Language',
+                quarter: document.getElementById('tos-quarter')?.value || 'Term 1',
+                section: document.getElementById('tos-section-select')?.value || 'Section SATURN'
+            };
+        }
+
+        function getTOSContextStorageKey(context = getCurrentTOSContext()) {
+            return `deped_tos_v2_${encodeURIComponent(context.grade)}_${encodeURIComponent(context.subject)}_${encodeURIComponent(context.section)}_${encodeURIComponent(context.quarter)}`;
+        }
+
+        function setTOSSaveStatus(message, isError = false) {
+            const status = document.getElementById('tos-save-status');
+            if (!status) return;
+            status.textContent = message;
+            status.classList.toggle('text-rose-700', isError);
+            status.classList.toggle('text-slate-500', !isError);
+        }
+
         function saveTOSData() {
+            if (!Array.isArray(tosData) || tosData.length === 0) {
+                setTOSSaveStatus('This TOS is blank. Add at least one competency before saving.', true);
+                return;
+            }
             const grade = document.getElementById('tos-grade')?.value || '1';
             const subject = document.getElementById('tos-subject')?.value || 'Language';
             const quarter = document.getElementById('tos-quarter')?.value || 'Term 1';
             const section = document.getElementById('tos-section-select')?.value || 'Section SATURN';
             const teacher = document.getElementById('tos-teacher-input')?.value || '';
-            const targetItems = document.getElementById('tos-target-items')?.value || 25;
+            const targetItems = Math.max(1, Math.min(100, Number(document.getElementById('tos-target-items')?.value) || 25));
 
             const tosPayload = {
-                grade, subject, quarter, section, teacher, targetItems,
-                tosData,
+                schemaVersion: 2, grade, subject, quarter, section, teacher, targetItems,
+                tosData: JSON.parse(JSON.stringify(tosData)),
                 savedAt: new Date().toISOString()
             };
 
-            localStorage.setItem('deped_tos_latest', JSON.stringify(tosPayload));
-            localStorage.setItem(`deped_tos_Grade${grade}_${subject}_${section}`, JSON.stringify(tosPayload));
-            alert(`TOS data saved successfully for Grade ${grade} ${subject} (${section})!`);
+            try {
+                localStorage.setItem(getTOSContextStorageKey(tosPayload), JSON.stringify(tosPayload));
+                localStorage.setItem('deped_tos_latest', JSON.stringify(tosPayload));
+                setTOSSaveStatus(`Saved for Grade ${grade} · ${section} · ${subject} · ${quarter} (Teacher: ${teacher || 'not set'}).`);
+                announce(`TOS saved for Grade ${grade}, ${section}, ${subject}, ${quarter}.`);
+            } catch (error) {
+                setTOSSaveStatus('Could not save this TOS. Browser storage may be full.', true);
+            }
+        }
+
+        function retrieveSavedTOSData({ silent = false } = {}) {
+            const context = getCurrentTOSContext();
+            const contextKey = getTOSContextStorageKey(context);
+            const legacyKey = `deped_tos_Grade${context.grade}_${context.subject}_${context.section}`;
+            let parsed = null;
+            try {
+                const saved = localStorage.getItem(contextKey) || localStorage.getItem(legacyKey);
+                if (saved) parsed = JSON.parse(saved);
+                if (parsed && (
+                    String(parsed.grade) !== String(context.grade) ||
+                    parsed.subject !== context.subject ||
+                    parsed.section !== context.section ||
+                    (parsed.quarter && parsed.quarter !== context.quarter)
+                )) parsed = null;
+                if (!parsed) {
+                    const latest = JSON.parse(localStorage.getItem('deped_tos_latest') || 'null');
+                    if (latest && String(latest.grade) === String(context.grade) && latest.subject === context.subject && latest.section === context.section && (!latest.quarter || latest.quarter === context.quarter)) parsed = latest;
+                }
+            } catch (error) {
+                console.error('Could not retrieve saved TOS.', error);
+            }
+
+            if (!parsed || !Array.isArray(parsed.tosData)) {
+                tosData = [];
+                document.getElementById('tos-target-items').value = '25';
+                document.getElementById('tos-teacher-input').value = '';
+                renderTOSTable();
+                updateTOSHeaderPill();
+                updateAIPromptTexts();
+                if (typeof renderOMRSheetStudioPreview === 'function') renderOMRSheetStudioPreview();
+                setTOSSaveStatus(`Blank TOS ready for Grade ${context.grade} · ${context.section} · ${context.subject} · ${context.quarter}. Add competencies, then save.`);
+                return false;
+            }
+
+            tosData = parsed.tosData.map((item, index) => ({
+                code: String(item.code || `LC ${index + 1}`),
+                text: String(item.text || ''),
+                days: Math.max(0, Number(item.days) || 0),
+                rem: Math.max(0, Number(item.rem) || 0),
+                und: Math.max(0, Number(item.und) || 0),
+                app: Math.max(0, Number(item.app) || 0),
+                ana: Math.max(0, Number(item.ana) || 0),
+                eva: Math.max(0, Number(item.eva) || 0),
+                cre: Math.max(0, Number(item.cre) || 0)
+            }));
+            const targetItems = Math.max(1, Math.min(100, Number(parsed.targetItems) || 25));
+            document.getElementById('tos-target-items').value = String(targetItems);
+            document.getElementById('test-paper-item-count').value = String(generatedQuestions.length || targetItems);
+            if (typeof parsed.teacher === 'string') document.getElementById('tos-teacher-input').value = parsed.teacher;
+            renderTOSTable();
+            updateTOSHeaderPill();
+            updateAIPromptTexts();
+            if (typeof renderOMRSheetStudioPreview === 'function') renderOMRSheetStudioPreview();
+            setTOSSaveStatus(`Retrieved saved TOS for Grade ${context.grade} · ${context.section} · ${context.subject} · ${context.quarter} (Teacher: ${parsed.teacher || 'not set'}).`);
+            if (!silent) announce(`Saved TOS retrieved for Grade ${context.grade}, ${context.section}, ${context.subject}, ${context.quarter}.`);
+            return true;
         }
 
         function loadSavedTOSData() {
-            const saved = localStorage.getItem('deped_tos_latest');
-            if (saved) {
-                try {
-                    const parsed = JSON.parse(saved);
-                    if (parsed.tosData && Array.isArray(parsed.tosData)) {
-                        tosData = parsed.tosData;
-                    }
-                } catch(e) {
-                    console.error('Error loading saved TOS:', e);
-                }
-            }
+            return retrieveSavedTOSData({ silent: true });
         }
 
         function renderTOSTable() {
@@ -2595,6 +2682,10 @@
             let totalComputed = 0;
 
             tbody.innerHTML = '';
+
+            if (tosData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="13" class="p-6 text-center text-sm text-slate-500">This TOS is blank. Add a competency to begin preparing it for the selected grade, section, subject, and term.</td></tr>';
+            }
 
             tosData.forEach((item, index) => {
                 let remCnt = parseInt(item.rem) || 0;
@@ -2695,6 +2786,10 @@
         }
 
         function generateTestFromTOS() {
+            if (!tosData.length) {
+                setTOSSaveStatus('Add at least one competency to the TOS before generating the test paper.', true);
+                return;
+            }
             try { localStorage.removeItem('deped_custom_test_questions'); } catch (error) { console.warn('Could not clear saved custom questions before regeneration.', error); }
             renderTOSTable();
             generatedQuestions = [];
