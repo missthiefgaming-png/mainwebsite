@@ -1265,7 +1265,7 @@
           >
             🌙 Dark
           </button>
-          <a href="./newsystemsnisir.html" class="hidden sm:inline-flex shrink-0 whitespace-nowrap rounded-lg bg-blue-800 px-3 py-2 text-xs font-semibold hover:bg-blue-900">DepEd System</a>
+          <a href="./index.html" class="hidden sm:inline-flex shrink-0 whitespace-nowrap rounded-lg bg-blue-800 px-3 py-2 text-xs font-semibold hover:bg-blue-900">DepEd System</a>
           <span id="user-badge" class="hidden user-badge"></span>
           <button
             id="signout-btn"
@@ -2255,7 +2255,7 @@
           throw new Error("Supabase sign-in library did not load. Check your internet connection.");
         }
         if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY || SUPABASE_PUBLISHABLE_KEY.includes("PASTE_YOUR_")) {
-          throw new Error("Add your Supabase project publishable key in frontend/index.html before using Google sign-in.");
+          throw new Error("Add your Supabase project publishable key in frontend/attendance.html before using Google sign-in.");
         }
         supabaseAuthClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
           auth: {
