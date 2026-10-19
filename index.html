@@ -310,7 +310,7 @@
             <div id="display-school" class="text-sm font-extrabold text-blue-900 uppercase mt-1">MARISOL BLISS ELEMENTARY SCHOOL (ID: 107043)</div>
 
             <div class="mt-3 inline-block bg-blue-50 text-blue-900 text-xs font-bold px-4 py-1.5 rounded-full border border-blue-200" id="header-summary-pill">
-                Grade 1 (MATATAG) • Language • Term 1 • S.Y. 2026-2027
+                Grade 1 • Language • Term 1 • S.Y. 2026-2027
             </div>
         </div>
 
@@ -366,7 +366,7 @@
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">ACTIVE GRADE LEVEL</label>
                         <select id="db-grade" onchange="syncCredentials()" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-white font-bold text-slate-800">
-                            <option value="1">Grade 1 (MATATAG)</option>
+                            <option value="1">Grade 1</option>
                             <option value="2">Grade 2</option>
                             <option value="3">Grade 3</option>
                             <option value="4">Grade 4</option>
@@ -407,7 +407,8 @@
                     <input id="teacher-name" aria-label="Teacher name" placeholder="Teacher name" class="p-2 border rounded-lg text-xs">
                     <input id="teacher-email" type="email" aria-label="Teacher email" placeholder="Email address" class="p-2 border rounded-lg text-xs">
                     <select id="teacher-grade" aria-label="Teacher grade level" onchange="syncTeacherSectionOptions()" class="p-2 border rounded-lg text-xs"><option value="1">Grade 1</option><option value="2">Grade 2</option><option value="3">Grade 3</option><option value="4">Grade 4</option><option value="5">Grade 5</option><option value="6">Grade 6</option></select>
-                    <select id="teacher-section" aria-label="Teacher section" class="p-2 border rounded-lg text-xs"></select>
+                    <input id="teacher-section" list="teacher-section-options" aria-label="Teacher section" placeholder="Type or choose a section" class="p-2 border rounded-lg text-xs">
+                    <datalist id="teacher-section-options"></datalist>
                     <button onclick="addTeacherAccount()" class="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 py-2 text-xs font-bold">Add Teacher</button>
                 </div>
                 <div id="teacher-accounts-list" class="grid grid-cols-1 md:grid-cols-2 gap-2"></div>
@@ -448,7 +449,7 @@
                     <div class="flex items-center space-x-2">
                         <label class="text-xs font-bold text-slate-600 uppercase">SELECT GRADE:</label>
                         <select id="db-section-grade-filter" onchange="renderSections()" class="p-2 border border-slate-300 rounded-lg text-xs font-extrabold text-blue-900 bg-blue-50">
-                            <option value="1">Grade 1 (MATATAG)</option>
+                            <option value="1">Grade 1</option>
                             <option value="2">Grade 2</option>
                             <option value="3">Grade 3</option>
                             <option value="4">Grade 4</option>
@@ -520,6 +521,10 @@
                 <div class="rounded-xl border border-slate-200 bg-white p-4"><p class="text-xs font-bold uppercase text-slate-500">Marked absent</p><p id="shared-attendance-absent" class="mt-1 text-2xl font-bold text-amber-700">0</p></div>
             </div>
             <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                <div class="mb-3 flex flex-wrap items-center justify-between gap-2 border-b pb-3"><div><h3 class="font-bold text-slate-900">Learner roster from Attendance</h3><p class="mt-1 text-xs text-slate-500">New learners sync from the attendance page and can be selected for OMR review.</p></div><span id="shared-attendance-roster-count" class="rounded-full bg-blue-50 px-3 py-1 text-xs font-bold text-blue-800">0 learners</span></div>
+                <div class="overflow-x-auto"><table class="w-full min-w-[620px] text-left text-sm"><thead class="bg-slate-900 text-white"><tr><th class="p-3">Learner</th><th class="p-3">LRN</th><th class="p-3">Class / Section</th><th class="p-3">Parent / Guardian</th><th class="p-3">Action</th></tr></thead><tbody id="shared-attendance-learner-rows" class="divide-y divide-slate-100"></tbody></table></div>
+            </div>
+            <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
                 <div class="mb-3 flex flex-wrap items-center justify-between gap-2 border-b pb-3"><div><h3 class="font-bold text-slate-900">Attendance records</h3><p class="mt-1 text-xs text-slate-500">Names, LRNs, classes, check-in/out status, and SMS status.</p></div><span id="shared-attendance-record-count" class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700">0 records</span></div>
                 <div class="overflow-x-auto"><table class="w-full min-w-[720px] text-left text-sm"><thead class="bg-slate-900 text-white"><tr><th class="p-3">Time</th><th class="p-3">Learner</th><th class="p-3">LRN</th><th class="p-3">Class</th><th class="p-3">Attendance</th><th class="p-3">SMS</th></tr></thead><tbody id="shared-attendance-rows" class="divide-y divide-slate-100"></tbody></table></div>
             </div>
@@ -555,7 +560,7 @@
                     <div class="flex items-center space-x-2">
                         <label class="text-xs font-bold text-slate-500 uppercase">GRADE LEVEL:</label>
                         <select id="tos-grade" onchange="onGradeOrQuarterChange()" class="p-2 border border-slate-300 rounded-lg text-xs font-bold text-slate-700 bg-white">
-                            <option value="1">Grade 1 (MATATAG)</option>
+                            <option value="1">Grade 1</option>
                             <option value="2">Grade 2</option>
                             <option value="3">Grade 3</option>
                             <option value="4">Grade 4</option>
@@ -602,7 +607,7 @@
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">TARGET TOTAL ITEMS</label>
-                        <input type="number" id="tos-target-items" value="25" min="1" oninput="renderTOSTable()" class="w-full p-2 border border-slate-200 rounded-lg text-xs font-bold text-center text-blue-900">
+                        <div class="flex gap-2"><input type="number" id="tos-target-items" value="25" min="1" max="100" oninput="renderTOSTable()" class="w-full min-w-0 p-2 border border-slate-200 rounded-lg text-xs font-bold text-center text-blue-900"><button type="button" onclick="applyTargetItemCount()" class="shrink-0 rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white hover:bg-blue-700">Apply to test</button></div>
                     </div>
                 </div>
 
@@ -715,7 +720,9 @@
 
             <!-- ACTION BAR FOR TEST SHEET -->
             <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-wrap justify-between items-center gap-4 no-print">
-                <div class="flex items-center space-x-3">
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="flex items-center gap-2"><label for="test-paper-grade-select" class="text-xs font-bold text-slate-500 uppercase">Grade:</label><select id="test-paper-grade-select" onchange="setTestPaperGrade(this.value)" class="min-h-10 rounded-lg border border-slate-300 bg-white px-2 text-xs font-bold text-slate-700"><option value="1">Grade 1</option><option value="2">Grade 2</option><option value="3">Grade 3</option><option value="4">Grade 4</option><option value="5">Grade 5</option><option value="6">Grade 6</option></select></div>
+                    <div class="flex items-center space-x-3">
                     <label class="text-xs font-bold text-slate-500 uppercase">CHOICES COUNT:</label>
                     <select id="tos-choices-range" onchange="generateTestFromTOS()" class="p-2 border border-slate-300 rounded-lg text-xs font-bold text-slate-700 bg-white">
                         <option value="3">3 Choices (A - C)</option>
@@ -723,8 +730,11 @@
                         <option value="5">5 Choices (A - E)</option>
                     </select>
                     <span id="custom-item-count" class="rounded-full bg-blue-50 px-3 py-2 text-xs font-bold text-blue-800">25 items</span>
+                    </div>
                 </div>
                 <div class="flex items-center space-x-2">
+                    <label for="test-paper-item-count" class="sr-only">Number of test items</label><input id="test-paper-item-count" type="number" min="1" max="100" aria-label="Number of test items" class="min-h-10 w-20 rounded-lg border px-2 text-center text-xs font-bold">
+                    <button type="button" onclick="applyTestPaperItemCount()" class="min-h-10 rounded-lg bg-slate-100 px-3.5 py-2 text-xs font-bold text-slate-700 hover:bg-slate-200">Apply count</button>
                     <button type="button" onclick="addCustomTestItem()" class="min-h-10 rounded-lg bg-blue-600 px-3.5 py-2 text-xs font-bold text-white hover:bg-blue-700">+ Add custom item</button>
                     <button onclick="toggleAnswerKeyView()" id="btn-toggle-key" class="bg-slate-800 hover:bg-slate-700 text-white font-bold px-3.5 py-2 rounded-lg text-xs">👁️ Show Answer Key</button>
                     <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold px-3.5 py-2 rounded-lg text-xs">🖨️ Print Test Paper Sheet</button>
@@ -773,7 +783,7 @@
                     <div class="flex items-center space-x-2">
                         <label class="text-xs font-bold text-slate-500 uppercase">GRADE LEVEL:</label>
                         <select id="zip-grade-select" onchange="onZipGradeChange()" class="p-2 border border-slate-300 rounded-lg text-xs font-bold text-slate-700 bg-white">
-                            <option value="1">Grade 1 (MATATAG)</option>
+                            <option value="1">Grade 1</option>
                             <option value="2">Grade 2</option>
                             <option value="3">Grade 3</option>
                             <option value="4">Grade 4</option>
@@ -907,7 +917,7 @@
                 <div class="space-y-1">
                     <label class="block text-[11px] font-extrabold text-slate-600 uppercase">GRADE LEVEL</label>
                     <select id="omr-sheet-grade-select" onchange="onOMRGradeSelectChange()" class="w-full p-2 border border-slate-300 rounded-xl text-xs font-bold text-slate-800 bg-slate-50 focus:bg-white focus:ring-2 focus:ring-blue-500">
-                        <option value="1">Grade 1 (MATATAG)</option>
+                        <option value="1">Grade 1</option>
                         <option value="2">Grade 2</option>
                         <option value="3">Grade 3</option>
                         <option value="4">Grade 4</option>
@@ -1016,7 +1026,7 @@
             <div class="flex items-center space-x-2">
                 <label class="text-xs font-extrabold text-blue-900 uppercase">GRADE LEVEL:</label>
                 <select id="omr-scan-grade" onchange="onOMRScanContextChange()" class="p-2 border border-blue-200 rounded-xl text-xs font-bold text-slate-800 bg-blue-50/50 focus:bg-white focus:ring-2 focus:ring-blue-500">
-                    <option value="1">Grade 1 (MATATAG)</option>
+                    <option value="1">Grade 1</option>
                     <option value="2">Grade 2</option>
                     <option value="3">Grade 3</option>
                     <option value="4">Grade 4</option>
@@ -1083,7 +1093,8 @@
                             Choose Image File
                             <input id="omr-single-file-input" type="file" accept="image/*" onchange="handleSingleOMRImageUpload(event)" class="hidden">
                         </label>
-                        <select id="omr-scan-student-select" class="p-1.5 border border-slate-700 rounded-lg text-xs bg-slate-900 text-white font-bold"></select>
+                        <select id="omr-scan-student-select" aria-label="Select an assessment or attendance learner" class="p-1.5 border border-slate-700 rounded-lg text-xs bg-slate-900 text-white font-bold"></select>
+                        <p class="w-full text-[10px] text-slate-400">Attendance learners sync here automatically.</p>
                     </div>
                 </div>
             </div>
@@ -1241,7 +1252,7 @@
                     <div class="flex items-center space-x-2">
                         <label class="text-xs font-bold text-slate-500 uppercase">GRADE LEVEL:</label>
                         <select id="mpl-grade-select" onchange="renderMPL()" class="p-2 border border-slate-300 rounded-lg text-xs font-bold text-slate-700 bg-white">
-                            <option value="1">Grade 1 (MATATAG)</option>
+                            <option value="1">Grade 1</option>
                             <option value="2">Grade 2</option>
                             <option value="3">Grade 3</option>
                             <option value="4">Grade 4</option>
@@ -1270,7 +1281,7 @@
             <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 space-y-6">
                 <div class="text-center">
                     <div class="inline-block bg-blue-50 text-blue-900 text-xs font-bold px-6 py-2 rounded-full border border-blue-200 shadow-2xs" id="mpl-sheet-badge">
-                        Grade 1 (MATATAG) • Language • Term 1 • S.Y. 2026-2027 • Total Items: 25
+                        Grade 1 • Language • Term 1 • S.Y. 2026-2027 • Total Items: 25
                     </div>
                 </div>
 
@@ -1322,7 +1333,7 @@
                     <div class="flex items-center space-x-2">
                         <label class="text-xs font-bold text-slate-500 uppercase">GRADE LEVEL:</label>
                         <select id="ml-grade-select" onchange="onMLGradeChange()" class="p-2 border border-slate-300 rounded-lg text-xs font-bold text-slate-700 bg-white">
-                            <option value="1">Grade 1 (MATATAG)</option>
+                            <option value="1">Grade 1</option>
                             <option value="2">Grade 2</option>
                             <option value="3">Grade 3</option>
                             <option value="4">Grade 4</option>
@@ -1356,7 +1367,7 @@
             <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 space-y-6">
                 <div class="text-center">
                     <div class="inline-block bg-blue-50 text-blue-900 text-xs font-bold px-6 py-2 rounded-full border border-blue-200 shadow-2xs" id="ml-sheet-badge">
-                        Grade 1 (MATATAG) • Language • Section SATURN • Term 1 • S.Y. 2026-2027
+                        Grade 1 • Language • Section SATURN • Term 1 • S.Y. 2026-2027
                     </div>
                 </div>
 
@@ -1707,9 +1718,12 @@
         });
 
         window.addEventListener('storage', event => {
-            if (event.key === 'sys_learners' || event.key === 'sys_attendance_logs' || event.key === null) renderSharedAttendance();
+            if (event.key === 'sys_learners' || event.key === 'sys_attendance_logs' || event.key === null) {
+                renderSharedAttendance();
+                syncOMRDropdowns();
+            }
         });
-        window.addEventListener('focus', renderSharedAttendance);
+        window.addEventListener('focus', () => { renderSharedAttendance(); syncOMRDropdowns(); });
 
         document.addEventListener('keydown', event => {
             if (event.key === 'Escape') {
@@ -1751,9 +1765,9 @@
 
         function syncTeacherSectionOptions() {
             const grade = document.getElementById('teacher-grade')?.value || '1';
-            const select = document.getElementById('teacher-section');
-            if (!select) return;
-            select.innerHTML = (schoolSections[grade] || []).map(section => `<option value="${escapeCalendarText(section)}">${escapeCalendarText(section)}</option>`).join('');
+            const options = document.getElementById('teacher-section-options');
+            if (!options) return;
+            options.innerHTML = (schoolSections[grade] || []).map(section => `<option value="${escapeCalendarText(section)}"></option>`).join('');
         }
 
         function addTeacherAccount() {
@@ -1762,6 +1776,7 @@
             const grade = document.getElementById('teacher-grade').value;
             const section = document.getElementById('teacher-section').value;
             if (!name || !email || !/^\S+@\S+\.\S+$/.test(email)) return alert('Enter a teacher name and valid email address.');
+            if (!section.trim()) return alert('Type or choose the teacher’s section.');
             if (teacherAccounts.some(account => account.email === email)) return alert('A teacher account with this email already exists.');
             teacherAccounts.push({ id: Date.now(), name, email, grade, section, active: true });
             localStorage.setItem('deped_teacher_accounts', JSON.stringify(teacherAccounts));
@@ -1861,6 +1876,20 @@
             return parsed && !Number.isNaN(parsed.getTime()) ? localDateKey(parsed) : '';
         }
 
+        function useAttendanceLearnerForOMR(lrn) {
+            const student = getAttendanceLearnersForOMR().find(item => item.lrn === String(lrn));
+            if (!student) return alert('This learner is no longer in the attendance roster. Refresh the attendance data and try again.');
+            switchTab('omr');
+            switchOMRSubTab('scan');
+            syncOMRDropdowns();
+            const selector = document.getElementById('omr-scan-student-select');
+            const optionValue = `attendance:${student.lrn}`;
+            if (selector && [...selector.options].some(option => option.value === optionValue)) {
+                selector.value = optionValue;
+                announce(`${student.name || 'Learner'} selected for OMR review.`);
+            }
+        }
+
         function renderSharedAttendance() {
             const learners = readSharedAttendanceList('sys_learners');
             const logs = readSharedAttendanceList('sys_attendance_logs');
@@ -1872,6 +1901,14 @@
             const dayLogs = logs.filter(log => getSharedAttendanceDate(log) === selectedDate);
             const uniqueCount = mode => new Set(dayLogs.filter(log => log.mode === mode).map(log => String(log.lrn || log.name || ''))).size;
             document.getElementById('shared-attendance-learners').textContent = learners.length;
+            const rosterFiltered = learners.filter(student => !query || `${student.name || ''} ${student.lrn || ''} ${student.className || ''}`.toLowerCase().includes(query));
+            const rosterCount = document.getElementById('shared-attendance-roster-count');
+            if (rosterCount) rosterCount.textContent = `${learners.length} learner${learners.length === 1 ? '' : 's'}`;
+            const rosterRows = document.getElementById('shared-attendance-learner-rows');
+            if (rosterRows) rosterRows.innerHTML = rosterFiltered.length ? rosterFiltered.map(student => {
+                const lrn = String(student.lrn || '');
+                return `<tr><td class="p-3 font-semibold">${escapeCalendarText(student.name || 'Unnamed learner')}</td><td class="p-3 font-mono">${escapeCalendarText(lrn)}</td><td class="p-3">${escapeCalendarText(student.className || 'Unassigned')}</td><td class="p-3">${escapeCalendarText(student.parentName || 'Not provided')}</td><td class="p-3"><button type="button" onclick="useAttendanceLearnerForOMR('${escapeCalendarText(lrn)}')" class="min-h-10 rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white hover:bg-blue-700">Use in OMR</button></td></tr>`;
+            }).join('') : '<tr><td colspan="5" class="p-4 text-center text-sm text-slate-500">No attendance learners match this search.</td></tr>';
             document.getElementById('shared-attendance-in').textContent = uniqueCount('Time IN');
             document.getElementById('shared-attendance-out').textContent = uniqueCount('Time OUT');
             document.getElementById('shared-attendance-absent').textContent = uniqueCount('Absent');
@@ -2278,7 +2315,9 @@
             if (omrGrade) omrGrade.value = dbGrade;
 
             renderSections();
+            updateSubjectDropdown();
             updateTOSHeaderPill();
+            updateAIPromptTexts();
             if (typeof renderOMRSheetStudioPreview === 'function') renderOMRSheetStudioPreview();
         }
 
@@ -2287,11 +2326,11 @@
         }
 
         function renderSections() {
-            const currentGrade = document.getElementById('db-section-grade-filter')?.value || document.getElementById('db-grade')?.value || '1';
-            const sections = schoolSections[currentGrade] || [];
+            const managementGrade = document.getElementById('db-section-grade-filter')?.value || document.getElementById('db-grade')?.value || '1';
+            const sections = schoolSections[managementGrade] || [];
 
             const gradeLabel = document.getElementById('db-managing-grade-label');
-            if (gradeLabel) gradeLabel.textContent = `Grade ${currentGrade}`;
+            if (gradeLabel) gradeLabel.textContent = `Grade ${managementGrade}`;
 
             const container = document.getElementById('dashboard-sections-container');
             const select = document.getElementById('tos-section-select');
@@ -2306,15 +2345,35 @@
                     sections.forEach((sec, idx) => {
                         const badge = document.createElement('span');
                         badge.className = "bg-slate-100 text-slate-800 text-xs font-bold px-3 py-1.5 rounded-lg border flex items-center space-x-2";
-                        badge.innerHTML = `<span>${sec}</span><button onclick="removeSection('${currentGrade}', ${idx})" class="text-slate-400 hover:text-rose-600 font-bold">✕</button>`;
+                        badge.innerHTML = `<span>${escapeCalendarText(sec)}</span><button onclick="removeSection('${managementGrade}', ${idx})" class="text-slate-400 hover:text-rose-600 font-bold">✕</button>`;
                         container.appendChild(badge);
                     });
                 }
             }
 
-            if (select) select.innerHTML = sections.map(s => `<option value="${s}">${s}</option>`).join('');
-            if (defaultSecSelect) defaultSecSelect.innerHTML = sections.map(s => `<option value="${s}">${s}</option>`).join('');
-            if (omrSecSelect) omrSecSelect.innerHTML = sections.map(s => `<option value="${s}">${s}</option>`).join('');
+            const tosGrade = document.getElementById('tos-grade')?.value || document.getElementById('db-grade')?.value || '1';
+            const tosSections = schoolSections[tosGrade] || [];
+            if (select) {
+                const previous = select.value;
+                select.innerHTML = tosSections.map(section => `<option value="${escapeCalendarText(section)}">${escapeCalendarText(section)}</option>`).join('');
+                if (tosSections.includes(previous)) select.value = previous;
+            }
+
+            const activeGrade = document.getElementById('db-grade')?.value || '1';
+            const activeSections = schoolSections[activeGrade] || [];
+            if (defaultSecSelect) {
+                const previous = defaultSecSelect.value;
+                defaultSecSelect.innerHTML = activeSections.map(section => `<option value="${escapeCalendarText(section)}">${escapeCalendarText(section)}</option>`).join('');
+                if (activeSections.includes(previous)) defaultSecSelect.value = previous;
+            }
+
+            const omrGrade = document.getElementById('omr-sheet-grade-select')?.value || activeGrade;
+            const omrSections = schoolSections[omrGrade] || [];
+            if (omrSecSelect) {
+                const previous = omrSecSelect.value;
+                omrSecSelect.innerHTML = omrSections.map(section => `<option value="${escapeCalendarText(section)}">${escapeCalendarText(section)}</option>`).join('');
+                if (omrSections.includes(previous)) omrSecSelect.value = previous;
+            }
 
             syncOMRDropdowns();
             syncMLDropdowns();
@@ -2376,11 +2435,27 @@
 
         function onGradeOrQuarterChange() {
             updateSubjectDropdown();
+            renderSections();
             updateTOSHeaderPill();
             updateAIPromptTexts();
             syncOMRDropdowns();
             syncMLDropdowns();
             syncMPLDropdowns();
+        }
+
+        function setTestPaperGrade(grade) {
+            const validGrade = String(Math.max(1, Math.min(6, Number(grade) || 1)));
+            const dashboardGrade = document.getElementById('db-grade');
+            if (dashboardGrade) dashboardGrade.value = validGrade;
+            const tosGrade = document.getElementById('tos-grade');
+            if (tosGrade) tosGrade.value = validGrade;
+            const sectionFilter = document.getElementById('db-section-grade-filter');
+            if (sectionFilter) sectionFilter.value = validGrade;
+            const omrGrade = document.getElementById('omr-sheet-grade-select');
+            if (omrGrade) omrGrade.value = validGrade;
+            syncCredentials();
+            onGradeOrQuarterChange();
+            renderTestPaper();
         }
 
         function updateTOSHeaderPill() {
@@ -2390,8 +2465,10 @@
             const subject = subjectSelect ? subjectSelect.value : 'Language';
             const sy = document.getElementById('db-sy').value || '2026-2027';
             const pill = document.getElementById('header-summary-pill');
+            const testPaperGrade = document.getElementById('test-paper-grade-select');
+            if (testPaperGrade) testPaperGrade.value = grade;
             if (pill) {
-                pill.textContent = `Grade ${grade} (MATATAG) • ${subject} • ${quarter} • S.Y. ${sy}`;
+                pill.textContent = `Grade ${grade} • ${subject} • ${quarter} • S.Y. ${sy}`;
             }
 
             const tpHeader = document.getElementById('tp-subject-header');
@@ -2619,6 +2696,7 @@
 
         function generateTestFromTOS() {
             try { localStorage.removeItem('deped_custom_test_questions'); } catch (error) { console.warn('Could not clear saved custom questions before regeneration.', error); }
+            renderTOSTable();
             generatedQuestions = [];
 
                         masterAnswerKey = [];
@@ -2629,8 +2707,7 @@
             let tIdx = 0;
 
             tosData.forEach((lcItem) => {
-                let totalForLc = (lcItem.rem||0) + (lcItem.und||0) + (lcItem.app||0) + (lcItem.ana||0) + (lcItem.eva||0) + (lcItem.cre||0);
-                if (totalForLc === 0) totalForLc = lcItem.computed || 3;
+                const totalForLc = Math.max(0, Number(lcItem.computed) || 0);
 
                 for (let i = 0; i < totalForLc; i++) {
                     let tmpl = questionTemplates[tIdx % questionTemplates.length];
@@ -2803,6 +2880,8 @@
         function syncCustomItemCount() {
             const totalInput = document.getElementById('tos-target-items');
             if (totalInput) totalInput.value = generatedQuestions.length;
+            const paperCount = document.getElementById('test-paper-item-count');
+            if (paperCount) paperCount.value = generatedQuestions.length;
             const choiceCount = Math.max(3, Math.min(5, ...generatedQuestions.map(question => question.choices.length)));
             const choiceRange = document.getElementById('tos-choices-range');
             const sheetChoices = document.getElementById('omr-sheet-choices-select');
@@ -2815,6 +2894,47 @@
             renderZipSheet();
             renderMPL();
             renderMostLeastLearned();
+        }
+
+        function applyTestPaperItemCount() {
+            const paperCount = document.getElementById('test-paper-item-count');
+            const targetInput = document.getElementById('tos-target-items');
+            if (!paperCount || !targetInput) return;
+            targetInput.value = paperCount.value;
+            applyTargetItemCount();
+        }
+
+        function applyTargetItemCount() {
+            const input = document.getElementById('tos-target-items');
+            const count = Number(input?.value);
+            if (!Number.isInteger(count) || count < 1 || count > 100) {
+                alert('Choose a whole-number test length from 1 to 100 items.');
+                if (input) input.value = String(Math.max(1, Math.min(100, Number(generatedQuestions.length) || 25)));
+                const paperCount = document.getElementById('test-paper-item-count');
+                if (paperCount) paperCount.value = input?.value || '25';
+                return;
+            }
+            if (count < generatedQuestions.length && !confirm(`Reduce the test from ${generatedQuestions.length} to ${count} items? The extra items will be removed.`)) {
+                input.value = String(generatedQuestions.length);
+                const paperCount = document.getElementById('test-paper-item-count');
+                if (paperCount) paperCount.value = input.value;
+                return;
+            }
+
+            renderTOSTable();
+            generatedQuestions = generatedQuestions.slice(0, count);
+            masterAnswerKey = masterAnswerKey.slice(0, count);
+            const choiceCount = Number(document.getElementById('tos-choices-range')?.value || 4);
+            const letters = ['A', 'B', 'C', 'D', 'E'].slice(0, choiceCount);
+            while (generatedQuestions.length < count) {
+                const index = generatedQuestions.length;
+                generatedQuestions.push({ itemNum: index + 1, lcCode: 'CUSTOM', stem: '', choices: letters.map(() => ''), answer: 'A' });
+                masterAnswerKey.push('A');
+            }
+            generatedQuestions.forEach((question, index) => { question.itemNum = index + 1; });
+            saveCustomTestQuestions();
+            syncCustomItemCount();
+            updateAIPromptTexts();
         }
 
         function addCustomTestItem() {
@@ -3157,6 +3277,15 @@
             if (subTabId === 'results') renderOMRResults();
         }
 
+        function getAttendanceLearnersForOMR() {
+            const unique = new Map();
+            readSharedAttendanceList('sys_learners').forEach(student => {
+                const lrn = String(student.lrn || '').trim();
+                if (/^\d{6,15}$/.test(lrn) && !unique.has(lrn)) unique.set(lrn, { ...student, lrn });
+            });
+            return [...unique.values()].sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+        }
+
         function syncOMRDropdowns() {
             const currentGrade = document.getElementById('omr-sheet-grade-select')?.value || document.getElementById('db-grade')?.value || '1';
             const currentSubject = document.getElementById('tos-subject')?.value || 'Language';
@@ -3195,7 +3324,12 @@
 
             const studentSelect = document.getElementById('omr-scan-student-select');
             if (studentSelect) {
-                studentSelect.innerHTML = learnersData.map((s, idx) => `<option value="${idx}">${s.name}</option>`).join('');
+                const previousStudent = studentSelect.value;
+                const assessmentOptions = learnersData.map((student, index) => `<option value="assessment:${index}">${escapeCalendarText(student.name || `Learner ${index + 1}`)} · Assessment roster</option>`).join('');
+                const attendanceLearners = getAttendanceLearnersForOMR();
+                const attendanceOptions = attendanceLearners.map(student => `<option value="attendance:${escapeCalendarText(student.lrn)}">${escapeCalendarText(student.name || 'Learner')} · LRN ${escapeCalendarText(student.lrn)}</option>`).join('');
+                studentSelect.innerHTML = `<optgroup label="Assessment learners">${assessmentOptions}</optgroup>${attendanceOptions ? `<optgroup label="Attendance roster">${attendanceOptions}</optgroup>` : ''}`;
+                if ([...studentSelect.options].some(option => option.value === previousStudent)) studentSelect.value = previousStudent;
             }
 
             const scanTag = document.getElementById('omr-scanner-context-tag');
@@ -3607,10 +3741,19 @@
 
         function executeSingleOMRScan() {
             if (!omrSingleImageName) return alert('Choose an answer-sheet image first.');
-            const studentIdx = document.getElementById('omr-scan-student-select')?.value || 0;
-            const student = learnersData[studentIdx] || { name: '', sex: '' };
+            const selectedStudent = document.getElementById('omr-scan-student-select')?.value || 'assessment:0';
+            let student;
+            if (selectedStudent.startsWith('attendance:')) {
+                const lrn = selectedStudent.slice('attendance:'.length);
+                const attendanceStudent = getAttendanceLearnersForOMR().find(item => item.lrn === lrn);
+                if (!attendanceStudent) { syncOMRDropdowns(); return alert('That learner is no longer in the attendance roster. Refresh the learner list and try again.'); }
+                student = { name: attendanceStudent.name || '', sex: attendanceStudent.sex || '', lrn: attendanceStudent.lrn };
+            } else {
+                const studentIdx = Number(selectedStudent.replace('assessment:', '')) || 0;
+                student = learnersData[studentIdx] || { name: '', sex: '', lrn: '' };
+            }
             const staged = stageOMRReviewDraft({
-                sourceImageName: omrSingleImageName, sourceType: omrSingleImageSource, sourceImagePreview: omrSingleImagePreview, name: student.name || '', lrn: '',
+                sourceImageName: omrSingleImageName, sourceType: omrSingleImageSource, sourceImagePreview: omrSingleImagePreview, name: student.name || '', lrn: student.lrn || '',
                 grade: document.getElementById('omr-scan-grade')?.value || '1',
                 section: document.getElementById('omr-scan-section')?.value || 'Section SATURN',
                 subject: document.getElementById('omr-scan-subject')?.value || 'Language',
@@ -4110,7 +4253,7 @@
 
             const badgeEl = document.getElementById('mpl-sheet-badge');
             if (badgeEl) {
-                badgeEl.textContent = `Grade ${gradeVal} (MATATAG) • ${subjectVal} • ${quarterVal} • S.Y. ${syVal} • Total Items: ${totalItems}`;
+                badgeEl.textContent = `Grade ${gradeVal} • ${subjectVal} • ${quarterVal} • S.Y. ${syVal} • Total Items: ${totalItems}`;
             }
 
             const sections = schoolSections[gradeVal] || [];
@@ -4347,7 +4490,7 @@
 
             const badgeEl = document.getElementById('ml-sheet-badge');
             if (badgeEl) {
-                badgeEl.textContent = `Grade ${gradeVal} (MATATAG) • ${subjectVal} • ${sectionVal} • ${quarterVal} • S.Y. ${syVal}`;
+                badgeEl.textContent = `Grade ${gradeVal} • ${subjectVal} • ${sectionVal} • ${quarterVal} • S.Y. ${syVal}`;
             }
 
             const mostTbody = document.getElementById('most-learned-tbody');
