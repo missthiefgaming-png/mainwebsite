@@ -342,8 +342,8 @@
 
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
                 <div class="flex justify-between items-center pb-3 border-b">
-                    <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider">DepEd Official Credentials & Class Info</h3>
-                    <button onclick="saveDashboardCredentials()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-bold text-xs">Save Credentials</button>
+                    <div><h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider">School Profile &amp; Class Info</h3><p class="mt-1 text-xs text-slate-500">Saved in this browser/device only; grade sections and assessment records stay local.</p></div>
+                    <button type="button" onclick="saveDashboardCredentials()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-bold text-xs">Save School Settings</button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div>
@@ -375,11 +375,6 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">DEFAULT SECTION</label>
-                        <select id="db-default-section" onchange="syncCredentials()" class="w-full p-2 border border-slate-200 rounded-lg text-xs bg-white font-bold text-slate-800 uppercase">
-                        </select>
-                    </div>
-                    <div>
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">SCHOOL NAME</label>
                         <input type="text" id="db-school" oninput="syncCredentials()" class="w-full p-2 border border-slate-200 rounded-lg text-xs uppercase" value="MARISOL BLISS ELEMENTARY SCHOOL">
                     </div>
@@ -391,11 +386,8 @@
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">SCHOOL HEAD / PRINCIPAL</label>
                         <input type="text" id="db-head" oninput="syncCredentials()" class="w-full p-2 border border-slate-200 rounded-lg text-xs uppercase" value="CATHERINE M. BABIERA">
                     </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">CLASS ADVISER / TEACHER</label>
-                        <input type="text" id="db-adviser" oninput="syncCredentials()" class="w-full p-2 border border-slate-200 rounded-lg text-xs uppercase" value="RUTH ANN B. MARTIN">
-                    </div>
                 </div>
+                <p id="dashboard-save-status" class="text-xs text-slate-500" role="status" aria-live="polite"></p>
             </div>
 
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
@@ -611,6 +603,10 @@
                         <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">TARGET TOTAL ITEMS</label>
                         <div class="flex gap-2"><input type="number" id="tos-target-items" value="25" min="1" max="100" oninput="renderTOSTable()" class="w-full min-w-0 p-2 border border-slate-200 rounded-lg text-xs font-bold text-center text-blue-900"><button type="button" onclick="applyTargetItemCount()" class="shrink-0 rounded-lg bg-blue-600 px-3 py-2 text-xs font-bold text-white hover:bg-blue-700">Apply to test</button></div>
                     </div>
+                </div>
+                <div class="grid grid-cols-1 gap-3 border-t pt-3 sm:grid-cols-2 no-print">
+                    <div><label for="tos-prepared-by-input" class="mb-1 block text-[10px] font-bold uppercase text-slate-500">Prepared by</label><input id="tos-prepared-by-input" type="text" maxlength="120" value="RUTH ANN B. MARTIN" oninput="syncTOSSignatureNames()" class="w-full rounded-lg border border-slate-200 p-2 text-xs"></div>
+                    <div><label for="tos-approved-by-input" class="mb-1 block text-[10px] font-bold uppercase text-slate-500">Approved by</label><input id="tos-approved-by-input" type="text" maxlength="120" value="CATHERINE M. BABIERA" oninput="syncTOSSignatureNames()" class="w-full rounded-lg border border-slate-200 p-2 text-xs"></div>
                 </div>
 
                 <div class="overflow-x-auto custom-scroll border border-slate-200 rounded-xl">
@@ -1690,6 +1686,7 @@
                 }
             });
 
+            loadDashboardCredentials();
             loadSavedOMRScannedData();
             renderOMRReviewQueue();
             renderAssessmentHistory();
@@ -2290,7 +2287,6 @@
             const sch = document.getElementById('db-school').value || 'MARISOL BLISS ELEMENTARY SCHOOL';
             const schId = document.getElementById('db-school-id').value || '107043';
             const head = document.getElementById('db-head').value || 'CATHERINE M. BABIERA';
-            const adviser = document.getElementById('db-adviser').value || 'RUTH ANN B. MARTIN';
             const dbGrade = document.getElementById('db-grade')?.value || '1';
 
             document.getElementById('display-region').textContent = reg;
@@ -2298,14 +2294,7 @@
             document.getElementById('display-cluster').textContent = clus;
             document.getElementById('display-school').textContent = `${sch} (ID: ${schId})`;
 
-            document.getElementById('sig-teacher').textContent = adviser;
-            document.getElementById('sig-principal').textContent = head;
-            document.getElementById('tos-teacher-input').value = adviser;
-
-            const mlTeacher = document.getElementById('ml-sig-teacher');
-            const mlPrincipal = document.getElementById('ml-sig-principal');
-            if (mlTeacher) mlTeacher.textContent = adviser;
-            if (mlPrincipal) mlPrincipal.textContent = head;
+            syncTOSSignatureNames();
 
             const filterGrad = document.getElementById('db-section-grade-filter');
             if (filterGrad) filterGrad.value = dbGrade;
@@ -2329,7 +2318,59 @@
         }
 
         function saveDashboardCredentials() {
-            alert('Dashboard credentials & grade-level sections synchronized across all assessment components!');
+            const profile = {
+                region: document.getElementById('db-region').value.trim(),
+                division: document.getElementById('db-division').value.trim(),
+                cluster: document.getElementById('db-cluster').value.trim(),
+                schoolYear: document.getElementById('db-sy').value.trim(),
+                activeGrade: document.getElementById('db-grade').value,
+                school: document.getElementById('db-school').value.trim(),
+                schoolId: document.getElementById('db-school-id').value.trim(),
+                schoolHead: document.getElementById('db-head').value.trim(),
+                savedAt: new Date().toISOString()
+            };
+            try {
+                localStorage.setItem('deped_school_profile', JSON.stringify(profile));
+                localStorage.setItem('deped_school_sections', JSON.stringify(schoolSections));
+                const status = document.getElementById('dashboard-save-status');
+                if (status) status.textContent = 'School profile and grade sections saved on this browser/device only.';
+                announce('School settings saved locally on this device.');
+            } catch (error) {
+                const status = document.getElementById('dashboard-save-status');
+                if (status) status.textContent = 'Could not save these settings. Browser storage may be full.';
+            }
+        }
+
+        function loadDashboardCredentials() {
+            try {
+                const profile = JSON.parse(localStorage.getItem('deped_school_profile') || 'null');
+                if (profile && typeof profile === 'object') {
+                    const fields = { region: 'db-region', division: 'db-division', cluster: 'db-cluster', schoolYear: 'db-sy', activeGrade: 'db-grade', school: 'db-school', schoolId: 'db-school-id', schoolHead: 'db-head' };
+                    for (const [key, id] of Object.entries(fields)) {
+                        const element = document.getElementById(id);
+                        if (element && profile[key] != null) element.value = String(profile[key]);
+                    }
+                }
+                const sections = JSON.parse(localStorage.getItem('deped_school_sections') || 'null');
+                if (sections && typeof sections === 'object' && !Array.isArray(sections)) {
+                    for (const grade of ['1', '2', '3', '4', '5', '6']) {
+                        if (Array.isArray(sections[grade])) schoolSections[grade] = sections[grade].map(section => String(section)).filter(Boolean);
+                    }
+                }
+            } catch (error) {
+                console.warn('Could not load this device’s school settings.', error);
+            }
+        }
+
+        function persistSchoolSections() {
+            try {
+                localStorage.setItem('deped_school_sections', JSON.stringify(schoolSections));
+                return true;
+            } catch (error) {
+                const status = document.getElementById('dashboard-save-status');
+                if (status) status.textContent = 'Section changes could not be saved. Browser storage may be full.';
+                return false;
+            }
         }
 
         function renderSections() {
@@ -2341,7 +2382,6 @@
 
             const container = document.getElementById('dashboard-sections-container');
             const select = document.getElementById('tos-section-select');
-            const defaultSecSelect = document.getElementById('db-default-section');
             const omrSecSelect = document.getElementById('omr-sheet-section-select');
             
             if (container) {
@@ -2367,13 +2407,6 @@
             }
 
             const activeGrade = document.getElementById('db-grade')?.value || '1';
-            const activeSections = schoolSections[activeGrade] || [];
-            if (defaultSecSelect) {
-                const previous = defaultSecSelect.value;
-                defaultSecSelect.innerHTML = activeSections.map(section => `<option value="${escapeCalendarText(section)}">${escapeCalendarText(section)}</option>`).join('');
-                if (activeSections.includes(previous)) defaultSecSelect.value = previous;
-            }
-
             const omrGrade = document.getElementById('omr-sheet-grade-select')?.value || activeGrade;
             const omrSections = schoolSections[omrGrade] || [];
             if (omrSecSelect) {
@@ -2397,6 +2430,7 @@
                     secName = 'Section ' + secName;
                 }
                 schoolSections[currentGrade].push(secName);
+                persistSchoolSections();
                 input.value = '';
                 renderSections();
                 renderZipSheet();
@@ -2406,6 +2440,7 @@
         function removeSection(grade, idx) {
             if (schoolSections[grade]) {
                 schoolSections[grade].splice(idx, 1);
+                persistSchoolSections();
                 renderSections();
                 renderZipSheet();
             }
@@ -2570,6 +2605,19 @@
             status.classList.toggle('text-slate-500', !isError);
         }
 
+        function syncTOSSignatureNames() {
+            const preparedBy = document.getElementById('tos-prepared-by-input')?.value.trim() || '';
+            const approvedBy = document.getElementById('tos-approved-by-input')?.value.trim() || '';
+            const preparedSignature = document.getElementById('sig-teacher');
+            const approvedSignature = document.getElementById('sig-principal');
+            if (preparedSignature) preparedSignature.textContent = preparedBy || '____________________________';
+            if (approvedSignature) approvedSignature.textContent = approvedBy || '____________________________';
+            const mplTeacher = document.getElementById('ml-sig-teacher');
+            const mplPrincipal = document.getElementById('ml-sig-principal');
+            if (mplTeacher) mplTeacher.textContent = preparedBy || '____________________________';
+            if (mplPrincipal) mplPrincipal.textContent = approvedBy || '____________________________';
+        }
+
         function saveTOSData() {
             if (!Array.isArray(tosData) || tosData.length === 0) {
                 setTOSSaveStatus('This TOS is blank. Add at least one competency before saving.', true);
@@ -2580,10 +2628,12 @@
             const quarter = document.getElementById('tos-quarter')?.value || 'Term 1';
             const section = document.getElementById('tos-section-select')?.value || 'Section SATURN';
             const teacher = document.getElementById('tos-teacher-input')?.value || '';
+            const preparedBy = document.getElementById('tos-prepared-by-input')?.value.trim() || '';
+            const approvedBy = document.getElementById('tos-approved-by-input')?.value.trim() || '';
             const targetItems = Math.max(1, Math.min(100, Number(document.getElementById('tos-target-items')?.value) || 25));
 
             const tosPayload = {
-                schemaVersion: 2, grade, subject, quarter, section, teacher, targetItems,
+                schemaVersion: 2, grade, subject, quarter, section, teacher, preparedBy, approvedBy, targetItems,
                 tosData: JSON.parse(JSON.stringify(tosData)),
                 savedAt: new Date().toISOString()
             };
@@ -2624,6 +2674,9 @@
                 tosData = [];
                 document.getElementById('tos-target-items').value = '25';
                 document.getElementById('tos-teacher-input').value = '';
+                document.getElementById('tos-prepared-by-input').value = '';
+                document.getElementById('tos-approved-by-input').value = document.getElementById('db-head')?.value || '';
+                syncTOSSignatureNames();
                 renderTOSTable();
                 updateTOSHeaderPill();
                 updateAIPromptTexts();
@@ -2647,6 +2700,9 @@
             document.getElementById('tos-target-items').value = String(targetItems);
             document.getElementById('test-paper-item-count').value = String(generatedQuestions.length || targetItems);
             if (typeof parsed.teacher === 'string') document.getElementById('tos-teacher-input').value = parsed.teacher;
+            document.getElementById('tos-prepared-by-input').value = typeof parsed.preparedBy === 'string' ? parsed.preparedBy : (parsed.teacher || '');
+            document.getElementById('tos-approved-by-input').value = typeof parsed.approvedBy === 'string' ? parsed.approvedBy : (document.getElementById('db-head')?.value || '');
+            syncTOSSignatureNames();
             renderTOSTable();
             updateTOSHeaderPill();
             updateAIPromptTexts();
@@ -3511,7 +3567,7 @@
             const grade = document.getElementById('omr-sheet-grade-select')?.value || '1';
             const section = document.getElementById('omr-sheet-section-select')?.value || 'Section SATURN';
             const quarter = document.getElementById('tos-quarter')?.value || 'TERM 1';
-            const teacher = document.getElementById('db-adviser')?.value || 'RUTH ANN B. MARTIN';
+            const teacher = document.getElementById('tos-prepared-by-input')?.value.trim() || '';
 
             document.getElementById('omr-canvas-school').textContent = school;
             document.getElementById('omr-canvas-title').textContent = `${subject.toUpperCase()} - ANSWER SHEET`;
